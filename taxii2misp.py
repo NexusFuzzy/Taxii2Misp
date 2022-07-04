@@ -9,6 +9,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from datetime import datetime
 import uuid
 from datetime import date, datetime, timedelta
+import os
 
 today = date.today()
 
@@ -38,7 +39,7 @@ for c in collections:
 
     # We need to store or received STIX output to a file since PyMISP does not have a function
     # to load data from a string but only from a file
-    with open('envelope.json', 'w') as f:
+    with open(os.path.dirname(os.path.realpath(__file__)) + '\\envelope.json', 'w') as f:
         yesterday = datetime.today() - timedelta(days = 1 )
         # Get all objects which were added after our last poll
         items = collection.get_objects(added_after=str(yesterday).replace(" ", "T") + "Z")
@@ -63,7 +64,7 @@ for c in collections:
             f.write(json.dumps(j))
             
             # Now we are uploading our stuff
-            response = misp_src.upload_stix('envelope.json',version='2')
+            response = misp_src.upload_stix(os.path.dirname(os.path.realpath(__file__)) + '\\envelope.json',version='2')
             
             response_j = response.json()
             if response.status_code == 200:
