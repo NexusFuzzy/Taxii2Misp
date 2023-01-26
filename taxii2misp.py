@@ -10,6 +10,7 @@ from datetime import datetime
 import uuid
 from datetime import date, datetime, timedelta
 import os
+import codecs
 
 today = date.today()
 
@@ -39,7 +40,7 @@ for c in collections:
 
     # We need to store or received STIX output to a file since PyMISP does not have a function
     # to load data from a string but only from a file
-    with open(os.path.dirname(os.path.realpath(__file__)) + '\\envelope.json', 'w') as f:
+    with codecs.open(os.path.dirname(os.path.realpath(__file__)) + '\\envelope.json', 'w', 'utf-8') as f:
         yesterday = datetime.today() - timedelta(days = 1 )
         # Get all objects which were added after our last poll
         items = collection.get_objects(added_after=str(yesterday).replace(" ", "T") + "Z")
@@ -62,6 +63,7 @@ for c in collections:
             # HINT: If some uploads later fail with a 500 you might want to have a look at the content of envelope.json
             # DIRECTLY after writing it to disk since it might be empty (Antivirus detection?)
             f.write(json.dumps(j))
+            f.close()
             
             # Now we are uploading our stuff
             response = misp_src.upload_stix(os.path.dirname(os.path.realpath(__file__)) + '\\envelope.json',version='2')
